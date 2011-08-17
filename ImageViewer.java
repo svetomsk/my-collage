@@ -87,7 +87,15 @@ public class ImageViewer
         System.out.println(images.size());
         selected = jfc.getSelectedFile();
         image = ImageIO.read(selected);
-        ImageObject io = new ImageObject(image, images.size()*20, images.size()*20);               
+        ImageObject io = new ImageObject(image, images.size()*20, images.size()*20);        
+        /*ЛОМАЕТСЯ ВОТ ЗДЕСЬ ↓*/
+        io.addMouseListener(new MouseAdapter()
+        {
+            public void mousePressed(MouseEvent me)
+            {
+                System.out.println("Mouse pressed!");
+            }
+        });
         images.add(io);
         window.add(images.get(images.size()-1));
     }
