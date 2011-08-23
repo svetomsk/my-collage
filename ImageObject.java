@@ -25,6 +25,16 @@ public class ImageObject extends JLabel
         setBounds(x, y, imageWidth, imageHeight);
     }   
     
+    public void setx(int value)
+    {
+        x = value;
+    }
+    
+    public void sety(int value)
+    {
+        y = value;
+    }
+    
     public int getx()
     {
         return x;
