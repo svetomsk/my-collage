@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 public class ImageObject extends JLabel
 {
     private Image image;
+    private String name;
     private boolean isactiv;
     private int x, y, imageWidth, imageHeight;
     
@@ -24,6 +24,16 @@ public class ImageObject extends JLabel
         setPreferredSize(new Dimension(imageWidth, imageHeight));
         setBounds(x, y, imageWidth, imageHeight);
     }   
+    
+    public void setname(String value)
+    {
+        name = value;
+    }
+    
+    public String getname()
+    {
+        return name;
+    }
     
     public void setx(int value)
     {
