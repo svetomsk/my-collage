@@ -1,6 +1,5 @@
 package graphicswork;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -15,8 +14,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -25,10 +22,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ImageViewer 
 {
     JFrame window, askframe;
+    Text text = new Text();
     JTextField path, sizeX, sizeY;
     JLabel jfcl, wth, hth;
     JPanel jbp, jip;
@@ -46,14 +45,12 @@ public class ImageViewer
     public ImageViewer() 
     {
         images = new ArrayList<ImageObject>();
-        this.width = width;
-        this.height = height;
     }
     
     public void start()
     {
         //создание окна задания параметров
-        askframe = new JFrame("Welcome!");
+        askframe = new JFrame(text.settings());
         askframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         tk = Toolkit.getDefaultToolkit();
         askframe.setBounds(tk.getScreenSize().width/2 - 100, tk.getScreenSize().height/2-75, 200, 150);
@@ -61,18 +58,18 @@ public class ImageViewer
         askframe.setLayout(new FlowLayout());  
         
         //метка и текстовое поле для ввода пути файловика
-        jfcl =  new JLabel("JFileChooserPath");
+        jfcl =  new JLabel(text.path());
         path = new JTextField(15);
         
         //метки и поля для ввода размеров рабочей области
-        wth = new JLabel("Width: ");
+        wth = new JLabel(text.width());
         sizeX = new JTextField(3);
         
-        hth = new JLabel("Height: ");
+        hth = new JLabel(text.height());
         sizeY = new JTextField(3);
         
         //создание кнопки ОК
-        ok = new JButton("OK");
+        ok = new JButton(text.ok());
         ok.addActionListener(new ActionListener()
         {
            public void actionPerformed(ActionEvent ae)
@@ -91,7 +88,10 @@ public class ImageViewer
                    sizeY.setText("");
                }
                if(ready)
-                show();
+               {
+                   askframe.setVisible(false);
+                   show();
+               }
            }
         });
         
@@ -112,30 +112,32 @@ public class ImageViewer
         creatingMainWindow();
         
         jfc = new JFileChooser(jpath);
+        FileNameExtensionFilter ff = new FileNameExtensionFilter(text.filter1(), text.filter2(), text.filter3());
+        jfc.addChoosableFileFilter(ff);
         //слушатель для кнопки вызова JFileChooser
         listener = new ActionListener()
         {
             public void actionPerformed(ActionEvent ae)
             {
-                int status = jfc.showDialog(window, "Open");
+                int status = jfc.showDialog(window, text.open());
                 if(status == JFileChooser.APPROVE_OPTION)                
                     try
                     {
                         fileChooserEvent();
                     }catch (IOException ioe)
                     {
-                        System.err.println("JFileChooserEventExeption!!!");
+                        System.err.println(text.exception());
                     }                
             }
         };     
         
         //параметры кнопки для вызова файловика
-        filechooser = new JButton("Show JFileChooser");
+        filechooser = new JButton(text.show());
         filechooser.setPreferredSize(new Dimension(width-80, 20));
         filechooser.addActionListener(listener);
         
         //кнопка взятия координат и завершения работы приложения
-        get = new JButton("Get");
+        get = new JButton(text.get());
         get.setPreferredSize(new Dimension(55,20));
         get.addActionListener(new ActionListener()
         {
@@ -146,11 +148,12 @@ public class ImageViewer
                     bw = new BufferedWriter(new FileWriter("koordinaty.txt"));
                     for(int i = 0; i < images.size(); i++)
                     {
-                        bw.write(Integer.toString(images.get(i).getx()) + " " + Integer.toString(images.get(i).gety()) + "\r\n");
+                        bw.write(Integer.toString(images.get(i).getx()) + " " + Integer.toString(images.get(i).gety()) + " " +
+                                 images.get(i).getname() + "\r\n");
                     }
                     bw.close();
                 } catch (IOException ex) {
-                    System.err.println("Error during writing in file!");
+                    System.err.println(text.error());
                 }                 
                 
            }
@@ -167,7 +170,7 @@ public class ImageViewer
     
     private void creatingMainWindow()
     {
-        window = new JFrame("ImageViewer");
+        window = new JFrame(text.imageViewer());
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLayout(new FlowLayout());
         tk = Toolkit.getDefaultToolkit();
@@ -210,9 +213,10 @@ public class ImageViewer
     private void fileChooserEvent() throws IOException
     {
         selected = jfc.getSelectedFile();
-        image = ImageIO.read(selected);
-        final ImageObject io = new ImageObject(image, images.size()*20, images.size()*20);   
+        image = ImageIO.read(selected);       
+        final ImageObject io = new ImageObject(image, images.size()*20, images.size()*20);    
         io.setName(Integer.toString(images.size()));
+        io.setname(selected.getName());  
         //добавляем слушателя мыши для активации той или иной картинки
         io.addMouseListener(new MouseAdapter()
         {
